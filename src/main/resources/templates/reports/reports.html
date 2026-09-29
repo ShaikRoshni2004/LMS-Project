@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <main class="main-panel">
+        <div th:replace="~{fragments/navbar :: navbar(${pageTitle})}"></div>
+
+        <div class="content-area">
+            <div class="page-header">
+                <h3>Reports</h3>
+                <a th:href="@{/reports/export/csv(courseId=${selectedCourseId}, status=${selectedStatus}, fromDate=${fromDate}, toDate=${toDate})}" class="btn btn-outline-primary">Download CSV</a>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="summary-box">
+                        <h5>Total Students</h5>
+                        <p class="value" th:text="${totalStudents}">0</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-box">
+                        <h5>Total Courses</h5>
+                        <p class="value" th:text="${totalCourses}">0</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-box">
+                        <h5>Total Enrollments</h5>
+                        <p class="value" th:text="${totalEnrollments}">0</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-box">
+                        <h5>Active Students</h5>
+                        <p class="value" th:text="${activeStudents}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section mb-4">
+                <form th:action="@{/reports}" method="get" class="filter-row">
+                    <div>
+                        <label class="form-label" for="fromDate">From</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" th:value="${fromDate}">
+                    </div>
+                    <div>
+                        <label class="form-label" for="toDate">To</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" th:value="${toDate}">
+                    </div>
+                    <div>
+                        <label class="form-label" for="courseId">Course</label>
+                        <select id="courseId" name="courseId" class="form-select">
+                            <option value="">All Courses</option>
+                            <option th:each="course : ${courses}" th:value="${course.courseId}" th:text="${course.courseName}" th:selected="${course.courseId == selectedCourseId}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label" for="status">Status</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="Enrolled" th:selected="${selectedStatus == 'Enrolled'}">Enrolled</option>
+                            <option value="Completed" th:selected="${selectedStatus == 'Completed'}">Completed</option>
+                            <option value="Cancelled" th:selected="${selectedStatus == 'Cancelled'}">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                        <a th:href="@{/reports}" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card panel-card">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                        <tr>
+                            <th>Enrollment ID</th>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Enrollment Date</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(enrollments)}">
+                            <td colspan="5" class="empty-state">No report data available.</td>
+                        </tr>
+                        <tr th:each="enrollment : ${enrollments}">
+                            <td th:text="${enrollment.enrollmentId}">1</td>
+                            <td th:text="${enrollment.student.fullName}">Student</td>
+                            <td th:text="${enrollment.course.courseName}">Course</td>
+                            <td th:text="${#temporals.format(enrollment.enrollmentDate, 'yyyy-MM-dd')}">2024-01-01</td>
+                            <td>
+                                <span class="badge" th:classappend="${enrollment.status == 'Enrolled'} ? ' badge-active' : (${enrollment.status == 'Completed'} ? ' badge-completed' : ' badge-inactive')"
+                                      th:text="${enrollment.status}">Enrolled</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

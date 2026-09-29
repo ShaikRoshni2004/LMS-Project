@@ -1,0 +1,18 @@
+<nav th:fragment="navbar(pageTitle)" class="top-navbar">
+    <div class="topbar-left">
+        <button class="menu-toggle d-lg-none" type="button">
+            <i class="bi bi-list"></i>
+        </button>
+        <h2 class="page-title" th:text="${pageTitle}">Dashboard</h2>
+    </div>
+
+    <div class="topbar-right">
+        <div class="user-pill">
+            <i class="bi bi-person-circle"></i>
+            <span sec:authentication="name">User</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="logout-inline-form">
+            <button type="submit" class="btn btn-light btn-sm">Logout</button>
+        </form>
+    </div>
+</nav>
